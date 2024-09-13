@@ -4,12 +4,13 @@ function love.load()
     require "player"
     require "wall"
     require "box"
-
+    require "coin"
     player = Player(100, 100)
     wall = Wall(200, 100)
     box = Box(400, 150)
-
+    coin = Coin(400, 150)
     objects = {}
+    Coinscollected = 0
     table.insert(objects, player)
     table.insert(objects, box)
 
@@ -19,14 +20,14 @@ function love.load()
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {1,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {1,0,0,0,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1},
         {1,0,0,0,0,0,0,0,0,2,0,0,1,1,1,1,1,1,1,1,1},
         {1,2,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1},
         {1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
         {1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}   
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
     }
     for i,v in ipairs(map) do
         for j,w in ipairs(v) do
@@ -35,6 +36,9 @@ function love.load()
             end
             if w == 2 then
                 table.insert(objects, Box((j-1)*50, (i-1)*50))
+            end
+            if w == 3 then
+                table.insert(objects, Coin((j-1)*50, (i-1)*50))
             end
         end
     end
@@ -45,6 +49,15 @@ function love.update(dt)
         v:update(dt)
         for i,v in ipairs(walls) do
             v:update(dt)
+        end
+    end
+    for i = #objects, 1, -1 do
+        local obj = objects[i]
+        if obj ~= player and player:collidesWith(obj) then
+            if obj.isCoin then
+                table.remove(objects, i)
+                Coinscollected = Coinscollected + 1
+            end
         end
     end
 
@@ -81,6 +94,7 @@ function love.update(dt)
 end
 end --sssssss
 function love.draw()
+    love.graphics.push()
     love.graphics.translate(-player.x + 400, -player.y + 300)
     -- Draw all the objects
     for i,v in ipairs(objects) do
@@ -89,6 +103,8 @@ function love.draw()
     for i,v in ipairs(walls) do
         v:draw()
     end
+    love.graphics.pop()
+    love.graphics.print(Coinscollected, 10, 10)
 end
 
 function love.keypressed(key)
