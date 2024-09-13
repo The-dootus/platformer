@@ -18,6 +18,9 @@ function Player:update(dt)
         self.gravity = -300
         self.canJump = false
         end
+        if self.y > love.graphics.getHeight() then
+            love.load()
+        end
     end
 
     function Player:collide(e, direction)
