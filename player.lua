@@ -3,6 +3,7 @@ function Player:new (x, y)
     Player.super.new(self, x, y, "player.png")
     self.strength = 10
     self.canJump = true
+    self.health = 100
 end
 
 function Player:update(dt)
@@ -12,14 +13,17 @@ function Player:update(dt)
     elseif love.keyboard.isDown("right") then
         self.x = self.x + 200 * dt
     end
+    if self.health <= 0 then
+        
     end
+    if self.y > love.graphics.getHeight() then
+        love.load()
+    end
+end
     function Player:jump()
         if self.canJump then
         self.gravity = -300
         self.canJump = false
-        end
-        if self.y > love.graphics.getHeight() then
-            love.load()
         end
     end
 
@@ -34,6 +38,8 @@ function Player:update(dt)
             if e:is(Box) then
                 if direction == "bottom" then
                     return true
+                elseif direction == "top" then
+                    return false
                 else
                     return false
                 end
@@ -50,4 +56,8 @@ function Player:update(dt)
         function Player:collidesWith(other)
             return checkCollision(self, other)
         end
-        
+        function Player:takeDamage()
+            if Player:collidesWith(enemy) then
+            self.health = self.health - 50
+        end
+    end
